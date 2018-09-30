@@ -7,6 +7,7 @@ import 'normalize.css/normalize.css'
 import ElementUI from 'element-ui' // 引入element-ui
 import 'element-ui/lib/theme-chalk/index.css' // 引入element-ui样式
 import  $axios from './utils'
+import store from './store'
 
 Vue.prototype.$axios = $axios
 Vue.use(ElementUI)
@@ -16,6 +17,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

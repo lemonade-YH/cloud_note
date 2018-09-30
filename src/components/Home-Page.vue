@@ -5,14 +5,24 @@
           <div class="inner-left-title">13亿人都会用的云笔记</div>
         </div>
         <div class="inner-right">
-          <div class="inner-right-input">
-            <input type="text" placeholder="邮箱">
+          <div class="unlogged-status" v-if="!userInfo.username">
+            <div class="inner-right-input">
+              <input type="text" v-model="formData.email" placeholder="邮箱">
+            </div>
+            <div class="inner-right-input">
+              <input type="password" v-model="formData.password" placeholder="密码">
+            </div>
+            <el-button type="primary" @click="skipToLogin">登录</el-button>
+            <el-button @click="skipToRegister">注册</el-button>
           </div>
-          <div class="inner-right-input">
-            <input type="text" placeholder="密码">
+          <div class="logged-status" v-else>
+            <div class="head-portrait">
+              <img :src="userInfo.avatar" alt="">
+            </div>
+            <p>用户：{{userInfo.username}}</p>
+            <p>邮箱: {{userInfo.email}}</p>
+            <el-button type="warning" @click="logOut">退出登录</el-button>
           </div>
-          <el-button type="primary">登录</el-button>
-          <el-button @click="skipToRegister">注册</el-button>
         </div>
       </div>
       <div class="inner-content">
@@ -42,16 +52,57 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex'
     export default {
         name: "home--page",
         data(){
           return{
-
+            formData:{
+              email:'',
+              password:''
+            },
+            islogged:false
           }
+        },
+        computed:{
+          ...mapState(['userInfo'])
         },
         methods:{
           skipToRegister(){
             this.$router.push('register')
+          },
+          skipToLogin(){
+            this.$axios.post('/login',this.formData).then(res=>{
+              if(res.code == 200){
+                this.$message.success(res.msg)
+                setTimeout(()=>{
+                  this.$store.commit('ACCOUNT_INFOR',res.userData)
+                },1000)
+              }else {
+                this.$message.error(res.msg)
+              }
+            }).catch(err=>{
+              console.log(err)
+            })
+          },
+          logOut(){
+            this.$axios.get('/logout').then(res=>{
+              let Params = {
+                avatar:'',
+                email:'',
+                username:''
+              }
+              if(res.code == 200){
+                this.$message.success(res.msg)
+                this.$store.commit('ACCOUNT_INFOR',Params)
+                this.$router.push('/index')
+              }else {
+                this.$store.commit('ACCOUNT_INFOR',Params)
+                this.$message.error('登录信息过期，请重新登录')
+              }
+            }).catch(err=>{
+              console.log(err)
+            })
           }
         }
     }
@@ -93,6 +144,22 @@
       background-color: #fff;
       border-radius: 6px;
       padding: 21px 30px;
+      .logged-status{
+        .head-portrait{
+          text-align: center;
+          img{
+            width: 150px;
+            height: 150px;
+          }
+        }
+        p{
+          text-align: center;
+          margin-top: 10px;
+          font-size: 16px;
+          font-weight: 600;
+          color: #aaa;
+        }
+      }
     .inner-right-input{
       width: 300px;
       height: 43px;

@@ -10,6 +10,7 @@
           v-model="content"
           ref="myQuillEditor"
           :options="editorOption"
+          @change="handleChange"
           class="rich_text"
         >
         </quill-editor>
@@ -50,6 +51,12 @@
                 }
               }
             }
+          }
+        },
+        methods:{
+          handleChange({quill,html,text}){
+            this.content = text;
+            this.content = this.content.substring(0,200)+'...'
           }
         }
     }

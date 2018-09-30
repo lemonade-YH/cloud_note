@@ -2,7 +2,7 @@
     <div class="wrapper">
       <div class="inner">
         <div class="inner-left">
-          <a href="#">
+          <a href="/index">
             云笔记
           </a>
         </div>
@@ -23,7 +23,12 @@
         },
         methods:{
           write_node(){
-            this.$router.push('write_note')
+            if(this.$store.state.userInfo.username)
+            {
+              this.$router.push('write_note')
+            }else {
+              this.$message.warning('登录后才能写笔记哦。')
+            }
           }
         }
     }

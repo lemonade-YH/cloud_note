@@ -2,21 +2,50 @@
     <div class="wrapper">
       <h2>新用户注册</h2>
       <div class="input-box">
-        <input type="text" placeholder="用户名">
+        <input type="text" v-model="formData.username" placeholder="用户名">
       </div>
       <div class="input-box">
-        <input type="text" placeholder="邮箱">
+        <input type="text" v-model="formData.email" placeholder="邮箱">
       </div>
       <div class="input-box">
-        <input type="password" placeholder="密码">
+        <input type="password" v-model="formData.password" placeholder="密码">
       </div>
-      <el-button type="primary">注册</el-button>
+      <el-button type="primary" @click="signIn">注册</el-button>
     </div>
 </template>
 
 <script>
     export default {
-        name: "register"
+        name: "register",
+        data(){
+          return{
+            formData:{
+              username:'',
+              email:'',
+              password:''
+            }
+          }
+        },
+       methods:{
+         signIn(){
+           if(this.formData.password&&this.formData.password.length >= 5){
+             this.$axios.post('/user',this.formData).then(res=>{
+               if(res.code == 200){
+                 this.$message.success(res.msg)
+                 setTimeout(()=>{
+                   this.$router.push('/index')
+                 },1000)
+               }else{
+                 this.$message.error(res.msg)
+               }
+             }).catch(err=>{
+               console.log(err)
+             })
+           }else{
+             this.$message.error('密码不得小于5位')
+           }
+         }
+       }
     }
 </script>
 
