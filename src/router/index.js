@@ -6,7 +6,8 @@ const components = {
   layout:()=>import('@/views/layout'),
   home_page:()=>import('@/components/Home-Page'),
   register:()=>import('@/components/Register'),
-  write_note:()=>import('@/components/Write-Note')
+  write_note:()=>import('@/components/Write-Note'),
+  content_detail:()=>import('@/components/Content-Detail')
 }
 
 Vue.use(Router)
@@ -37,6 +38,10 @@ const router = new Router({
             title:'写笔记页面'
           },
           component:components.write_note
+        },
+        {
+          path:'content_detail',
+          component:components.content_detail
         }
       ]
     }

@@ -3,19 +3,22 @@
       <div class="outer">
         <h3>标题</h3>
         <div class="title_content">
-          <input type="text" placeholder="测试标题">
+          <input type="text" v-model="formData.title" placeholder="测试标题">
         </div>
         <h3>内容</h3>
         <quill-editor
-          v-model="content"
+          v-model="formData.content"
           ref="myQuillEditor"
           :options="editorOption"
           @change="handleChange"
           class="rich_text"
         >
         </quill-editor>
-        <p>标签</p>
-        <el-button type="primary">发布笔记</el-button>
+        <p>标签:</p>
+        <div class="category">
+          <radio :options="categories" v-model="formData.category"></radio>
+        </div>
+        <el-button @click="handleSubmit" type="primary">发布笔记</el-button>
       </div>
     </div>
 </template>
@@ -23,13 +26,20 @@
   import 'quill/dist/quill.snow.css'
   import {quillEditor, Quill} from 'vue-quill-editor'
   import {container, ImageExtend, QuillWatch} from 'quill-image-extend-module'
+  import radio from '@/components/Radios'
   Quill.register('modules/ImageExtend', ImageExtend)
     export default {
         name: "write--node",
-        components: {quillEditor},
+        components: {quillEditor,radio},
         data(){
           return{
-            content: '',
+            formData:{
+              content:'',
+              contentText:'',
+              title:'',
+              category:''
+            },
+            categories:[],
             // 富文本框参数设置
             editorOption: {
               modules: {
@@ -55,10 +65,37 @@
         },
         methods:{
           handleChange({quill,html,text}){
-            this.content = text;
-            this.content = this.content.substring(0,200)+'...'
+            this.formData.contentText = text;
+            this.formData.contentText  = this.formData.contentText.substring(0,50)+'...'
+          },
+          getCategoryData(){
+            this.$axios.get('/category').then(res=>{
+              if(res.code == 200){
+                this.categories = res.data
+              }
+            })
+          },
+          handleSubmit(){
+            this.$axios.post('/article',this.formData).then(res=>{
+              if(res.code == 200){
+                this.$message.success(res.msg)
+                setTimeout(()=>{
+                  this.$router.push('/index')
+                },1000)
+              }else if(res.code == 403){
+                this.$message.error('登录状态失效，请重新登录后写笔记!');
+                setTimeout(()=>{
+                  this.$router.push('/index');
+                },1000)
+              }
+            }).catch(err=>{
+              console.log(err)
+            })
           }
-        }
+        },
+      created(){
+          this.getCategoryData();
+      }
     }
 </script>
 
@@ -66,7 +103,7 @@
 .write_node{
   .outer{
     width: 1122px;
-    height: 565px;
+    height: 610px;
     background-color: #fff;
     padding: 8px 24px;
     margin: 30px auto 0;
@@ -91,8 +128,11 @@
       font-weight: 600;
       font-size: 14px;
     }
+    .category{
+      margin-top: 10px;
+    }
     /deep/ .el-button{
-      margin-top: 20px;
+      margin-top: 10px;
     }
   }
 }

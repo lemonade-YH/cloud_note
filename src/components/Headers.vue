@@ -2,7 +2,7 @@
     <div class="wrapper">
       <div class="inner">
         <div class="inner-left">
-          <a href="/index">
+          <a href="javascript:;" @click="skipToIndex">
             云笔记
           </a>
         </div>
@@ -29,6 +29,9 @@
             }else {
               this.$message.warning('登录后才能写笔记哦。')
             }
+          },
+          skipToIndex(){
+            this.$router.push('/index')
           }
         }
     }

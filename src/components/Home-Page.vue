@@ -25,28 +25,28 @@
           </div>
         </div>
       </div>
-      <div class="inner-content">
-        <a class="inner-content-outer" href="#">
+      <div class="inner-content" v-for="item in content">
+        <router-link :to="{path:'/content_detail',query:{id:item._id}}" class="routerlink">
         <div class="inner-content-msg">
           <div class="head-portrait">
-            <img src="../../static/猪.jpg" alt="">
+            <img :src="item.author.avatar" alt="">
           </div>
           <div class="intro">
             <div class="name">
-              <span class="name-id">yh</span>
-              <h2>哒哒哒</h2>
+              <span class="name-id" v-text="item.author.username">yh</span>
+              <h2 v-text="item.title">哒哒哒</h2>
             </div>
             <div class="look-nums">
               <span>浏览:8</span>
               <span>回复:0</span>
-              <span>分类:</span>
+              <span>分类:{{item.category.name}}</span>
             </div>
           </div>
         </div>
         <div class="inner-content-desc">
-          <p>哒哒哒。。。。</p>
+          <p v-text="item.contentText">哒哒哒。。。。</p>
         </div>
-        </a>
+        </router-link>
       </div>
     </div>
 </template>
@@ -61,7 +61,8 @@
               email:'',
               password:''
             },
-            islogged:false
+            islogged:false,
+            content:[]
           }
         },
         computed:{
@@ -103,8 +104,18 @@
             }).catch(err=>{
               console.log(err)
             })
-          }
-        }
+          },
+          getContentData(){
+            this.$axios.get('/article').then(res=>{
+              if(res.code == 200){
+                this.content = res.data
+              }
+            })
+          },
+        },
+      created(){
+          this.getContentData()
+      }
     }
 </script>
 
@@ -200,7 +211,7 @@
     margin-top: 30px;
     background-color: #fff;
     margin-left: 88px;
-    a{
+    .routerlink{
       display: block;
       height: 101px;
       margin-top: 20px;
@@ -231,7 +242,6 @@
             }
             h2{
               display: inline-block;
-              width: 54px;
               height: 24px;
               margin-left: 15px;
               line-height: 24px;
